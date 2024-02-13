@@ -21,8 +21,13 @@ text {
     flex: 1;
     display: flex;
     flex-direction: column;
-    max-width: 18em;  /* Adjust value as needed */
+    min-width: 18.75em; /* Minimum width in em */
+    max-width: 18.75em; /* Maximum width in em, equal to min-width for a fixed effect */  
+}
 
+#left_panel_text{
+    min-height: 20em; /* Minimum width in em */
+    max-height: 20em; /* Maximum width in em, equal to min-width for a fixed effect */
 }
 
 #short_paragraph, #long_paragraph {
@@ -43,3 +48,18 @@ flex: 0 0 auto;
     font-weight: bold;
 }
 
+.likert-container {
+    margin-bottom: 0.5em;
+}
+.likert-label {
+    display: inline-block;
+    min-width: 80;
+    text-align: center;
+}
+.textbox {
+    margin-left: 5px;
+}
+#likerts{
+    font-size: 10px;
+ 
+}

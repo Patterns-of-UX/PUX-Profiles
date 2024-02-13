@@ -5,9 +5,8 @@ const uniqueChildren = exp_list.map(item => item.name);
 const activitiesWithChildren = activities;
 
 // Set dimensions
-const width = 1150;
-const height = 700;
-const height_svg=700;//set for the first main viz
+const width = 500;
+const height = 1000;
 const padding=20;
 
 const STROKE_COLOR_ON = "green";
@@ -22,15 +21,19 @@ const BACKWARD_LINK_COLOR = "red";
 const OPACITY_ON = 1;
 const OPACITY_OFF = 0.2;
 
-const EXP_ID_TXT=270; // location of the experience id locs
 
-const START_POSITIVE_X = 380; // x pos for positive experiences
-const START_NEGATIVE_X = 700; // x pos for negative experiences
-const START_Y = 511.5; // Y pos for negative and positive experiences
+const START_POSITIVE_X =width/2; // regulates x axis position of activities
+
+
+const START_NEGATIVE_X = 0; //idk
+
+const START_Y = width*0.8; // regulates x abis position of experiences
+
+const EXP_ID_TXT=START_Y-15; // location of the experience id locs
 
 // Y pos for CIRCLE rows
-const Y_EXPERIENCES=400;
-const Y_ACTIVITIES=250;
+const Y_EXPERIENCES=START_POSITIVE_X+20;
+const Y_ACTIVITIES=START_Y/1;
 
 // ------ICON PARAMETERS------//
 const CIRCLE_RADIUS=15;
@@ -70,13 +73,13 @@ pux_list.forEach(function (element, index) {
 const xScale = d3
   .scalePoint()
   .domain(uniqueChildren)
-  .range([padding, width - padding])
+  .range([padding, height - padding])
   .padding(0.5);
 
 const yScale = d3
   .scalePoint()
   .domain(activitiesWithChildren.map((d) => d.name))
-  .range([padding, width - padding])
+  .range([padding, height - padding])
   .padding(0.5);
 
 // Line generator for curvy lines
@@ -86,15 +89,25 @@ const controlPointFactor = 0.9; // Adjust this factor to control the sharpness
 // Draw lines connecting ACTIVITIES and EXPERIENCES
 activities.forEach((activity) => {
   activity.imports.forEach((child) => {
+    // const points = [
+    //   [yScale(activity.name), Y_EXPERIENCES],
+    //   [
+    //     interpolate(yScale(activity.name), xScale(child), controlPointFactor),
+    //     (Y_EXPERIENCES + Y_ACTIVITIES) / 2,
+    //   ],
+    //   [xScale(child), Y_ACTIVITIES],
+    // ];
+
     const points = [
-      [yScale(activity.name), Y_EXPERIENCES],
+      [Y_EXPERIENCES, yScale(activity.name)],
       [
-        interpolate(yScale(activity.name), xScale(child), controlPointFactor),
         (Y_EXPERIENCES + Y_ACTIVITIES) / 2,
+        interpolate(yScale(activity.name), xScale(child), controlPointFactor),
       ],
-      [xScale(child), Y_ACTIVITIES],
+      [Y_ACTIVITIES, xScale(child)],
     ];
 
+    
     // console.log("PRINTING", activity.name, child);
     svg
       .append("path")
@@ -117,7 +130,6 @@ exp_list.forEach((d) => {
 
       const targetName = Object.keys(linkObj)[0];
       const strength = linkObj[targetName];
-      // const pos_y = calculatePosY(d, width, height_svg);
       const pos_y = Y_ACTIVITIES;
 
       experience_links.push({
@@ -137,19 +149,19 @@ exp_list.forEach((d) => {
 });
 
 // Draw arc-shaped links for EXPERIENCES
-svg
-  .append("g")
-  .selectAll("path")
-  .data(experience_links)
-  .enter()
-  .append("path")
-  .attr("class", "experiences_path")
-  .attr("id", (d) => `${d.source_id}-${d.target_id}`)
-  .attr("d", getPathString)
-  .attr("fill", "none")
-  .attr("stroke", (d) => d.color)
-  .attr("stroke-width", strokeWidth)
-  .attr("stroke-opacity", OPACITY_OFF);
+// svg
+//   .append("g")
+//   .selectAll("path")
+//   .data(experience_links)
+//   .enter()
+//   .append("path")
+//   .attr("class", "experiences_path")
+//   .attr("id", (d) => `${d.source_id}-${d.target_id}`)
+//   .attr("d", getPathString)
+//   .attr("fill", "none")
+//   .attr("stroke", (d) => d.color)
+//   .attr("stroke-width", strokeWidth)
+// .attr("stroke-opacity", OPACITY_OFF);
 
 // Draw nodes for activities (parents)
 svg
@@ -160,8 +172,8 @@ svg
   .append("circle")
   .attr("id", (d) => `activity_circle-${d.name}`)
   .attr("class", "activity_circle")
-  .attr("cx", (d) => yScale(d.name))
-  .attr("cy", yParent)
+  .attr("cx", yParent)
+  .attr("cy", (d) => yScale(d.name))
   .attr("r", CIRCLE_RADIUS/1.5 +"px")
   .attr("fill", "white")
   .attr("stroke", (d) => colorMap[d.name.slice(0, 2)])
@@ -176,8 +188,8 @@ svg
   .append("text")
   .attr("class", "activities_txt")
   .style("pointer-events", "none")
-  .attr("x", (d) => yScale(d.name))
-  .attr("y", Y_EXPERIENCES+42)
+  .attr("x", Y_EXPERIENCES+42)
+  .attr("y",(d) => yScale(d.name) )
   .attr("text-anchor", "middle")
   .style("font-size", "8px") // Original font size
   .style("fill", "darkgray") // Original color
@@ -192,8 +204,8 @@ svg
   .append("text")
   .attr("class", "activities_txt")
   .style("pointer-events", "none")
-  .attr("x", (d) => yScale(d.name))
-  .attr("y", Y_EXPERIENCES+33)
+  .attr("x",Y_EXPERIENCES+33 )
+  .attr("y",(d) => yScale(d.name) )
   .attr("text-anchor", "middle")
   .text((d) => d.id)
   .attr("id", (d) => `activity-${d.name}`);
@@ -210,11 +222,11 @@ d3.selectAll(".activity_circle")
     set_html_text(d,'activity');
 
     // show lists of ACTIVITIES in bottom left
-    activity_bullets(d);
+    //activity_bullets(d);
 
     // show lists of EXPERIENCES in bottom left
     //animates activity-experience paths
-    experience_bullets(d);
+   //experience_bullets(d);
 
   })
   .on("mouseout", function (event, d) {
@@ -224,7 +236,7 @@ d3.selectAll(".activity_circle")
     fade_activities_paths(3000);
 
     clear_html_text();
-    clear_bullets();
+    //clear_bullets();
 
      //remove vertical text over circles
      d3.selectAll(".experience_names").remove();
@@ -244,12 +256,12 @@ svg
   .append("circle")
   .attr("id", (d) => `experiences_circle-${d}`)
   .attr("class", "experience_circle")
-  .attr("cx", (d) => xScale(d))
-  .attr("cy", Y_ACTIVITIES-2)
+  .attr("cx",Y_ACTIVITIES-2 )
+  .attr("cy", (d) => xScale(d))
   .attr("r", CIRCLE_RADIUS_PX)
   .style("fill", (d) => colorMap[d.slice(0, 2)]);
 
-svg
+  svg
   .append("g")
   .selectAll("image.children")
   .data(uniqueChildren)
@@ -258,12 +270,19 @@ svg
   .attr("pointer-events", "none")
   .attr("id", (d) => `experiences_icon-${d}`)
   .attr("class", "experience_icon")
-  // .attr("xlink:href", (d) => "./icons/" + d.slice(0, 2) + "/" + d + ".png") //OR SVG
-  .attr("xlink:href", (d) => "./files/icons/vector/" + d + ".svg") //OR SVG
-  .attr("x", (d) => parseInt(xScale(d)) - ICON_WIDTH / 2)
-  .attr("y", 248 - ICON_HEIGHT / 2)
+  .attr("xlink:href", (d) => "./files/icons/vector/" + d + ".svg") // Adjusted path for clarity
+  .attr("x",ICON_HEIGHT / 2 )
+  .attr("y", (d) => parseInt(xScale(d)) - ICON_WIDTH / 2)
   .attr("width", ICON_WIDTH)
   .attr("height", ICON_HEIGHT);
+  
+  // .attr("transform", (d) => {
+  //   const xCenter =248 ;
+  //   const yCenter = parseInt(xScale(d));
+  //   return `rotate(-90, ${xCenter}, ${yCenter})`;
+  // });
+
+
 
 // Draw text labels for unique children
 svg
@@ -277,8 +296,8 @@ svg
   .style("pointer-events", "none")
   .style("font-size", "8px") // Original font size
   .style("fill", "darkgray") // Original color
-  .attr("x", (d) => xScale(d))
-  .attr("y", EXP_ID_TXT)
+  .attr("x", EXP_ID_TXT)
+  .attr("y", (d) => xScale(d))
   .attr("text-anchor", "middle")
   .text((d) => d)
   .attr("id", (d) => `experience-${d}`);
@@ -298,21 +317,21 @@ d3.selectAll(".experience_circle")
 
     clean_activities_paths();
 
-    clear_bullets();
+    //clear_bullets();
 
     set_html_text(d, 'experience');
    
-    combined_bullets(d, find_experience_parents(d));  //bottom left bullets
+    //combined_bullets(d, find_experience_parents(d));  //bottom left bullets
    
-    clean_experience_paths(); //set all experience paths gray
+    // clean_experience_paths(); //set all experience paths gray
 
     //highlight relevant icons
     d3.selectAll(".experience_circle").style("opacity", OPACITY_OFF);
     d3.select(this).style("opacity", OPACITY_ON);
 
     //draws animated paths, adds vertical text, and shows bullet points
-    experience_sentiments_bullets(d); // bullets for positive and negative experience correlations
-  
+    // experience_sentiments_bullets(d); // bullets for positive and negative experience correlations
+    find_experience_parents(d);
     icon_zoom(d);
 
     show_tooltip(d);
@@ -322,14 +341,14 @@ d3.selectAll(".experience_circle")
     if (isClicked) {
       console.log("clicked no mouseout");return;} // If clicked, disable mouseout behavior
 
-    clear_bullets();
+    //clear_bullets();
 
     clear_html_text();
    
     // clean_experience_paths();  //targets experience paths and circles
-    fade_experience_paths(3000)
+    //fade_experience_paths(3000)
     // clean_activities_paths(); //targets activity paths only (optional)
-    fade_activities_paths(3000);
+    // fade_activities_paths(3000);
 
     icon_dezoom(d);
 
@@ -346,14 +365,19 @@ let lastCircleX = 10; // Track the x-coordinate of the last drawn circle
 const circleSpacing = 30; // Spacing between circles
 let rect;
 
+// svg.style("transform", "rotate(90deg)");
 
-clickable_interaction();
+// d3.select("#svg-container").style("transform", "rotate(90deg)");
+
+
+
+//clickable_interaction();
 
 // =========== EXPERIENCE CIRCLES END =========== //
 
-add_strength_scale();
+//add_strength_scale();
 
-add_text_aid();
+//add_text_aid();
 
 load_animation();
 

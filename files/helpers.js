@@ -191,35 +191,35 @@ function getPathString(d) {
         .style("fill", "none")
         .style("stroke-opacity", OPACITY_ON);
 
-      show_experience_names(target);
+      // show_experience_names(target);
     });
 
-    const split_text = exp_bullet_list.split("\n");
-    split_text.pop(); // Remove the last empty string
+    // const split_text = exp_bullet_list.split("\n");
+    // split_text.pop(); // Remove the last empty string
 
-    // draw EXPERIENCE temp-circles for the list
-    split_text.forEach((text, i) => {
-      svg
-        .append("g")
-        .attr("class", "temp-circle")
-        .append("circle")
-        .attr("cx", 116.5)
-        .attr("cy", 547 + i * 15)
-        .attr("r", "5px")
-        .style("fill", colorMap[text.slice(1, 3)]);
-    });
+    // // draw EXPERIENCE temp-circles for the list
+    // split_text.forEach((text, i) => {
+    //   svg
+    //     .append("g")
+    //     .attr("class", "temp-circle")
+    //     .append("circle")
+    //     .attr("cx", 116.5)
+    //     .attr("cy", 547 + i * 15)
+    //     .attr("r", "5px")
+    //     .style("fill", colorMap[text.slice(1, 3)]);
+    // });
 
-    // write down entries in the EXPERIENCE list
-    d3.select("#experience_txt")
-      .attr("text-anchor", "start")
-      .selectAll("tspan")
-      .remove()
-      .data(split_text)
-      .enter()
-      .append("tspan")
-      .attr("x", 125)
-      .attr("dy", (d, i) => (i === 0 ? 0 : 15))
-      .text((d) => d);
+    // // write down entries in the EXPERIENCE list
+    // d3.select("#experience_txt")
+    //   .attr("text-anchor", "start")
+    //   .selectAll("tspan")
+    //   .remove()
+    //   .data(split_text)
+    //   .enter()
+    //   .append("tspan")
+    //   .attr("x", 125)
+    //   .attr("dy", (d, i) => (i === 0 ? 0 : 15))
+    //   .text((d) => d);
 }
 
 //both activites and experiences (bottom left)
@@ -327,28 +327,28 @@ function experience_sentiments_bullets(d){
         let path_id=element.source_id+"-"+element.target_id;
         let entry=` (${element.target_id}) ${PUX_COMPLETE[element.target_id].name} `;
         
-        // console.log("element", element);
-        // console.log(path_id, state,element.strength);
-        // console.log(PUX_COMPLETE[element.source_id])
-        // console.log(entry);
-        // console.log("target id ",element.target_id);
+        console.log("element", element);
+        console.log(path_id, state,element.strength);
+        console.log(PUX_COMPLETE[element.source_id])
+        console.log(entry);
+        console.log("target id ",element.target_id);
 
-        if(state=="positive"){
-            split_positive.push(entry)
-            animate_path(path_id, FORWARD_LINK_COLOR);
-        }
-        else{
-            split_negative.push(entry)
-            animate_path(path_id, BACKWARD_LINK_COLOR);
-        }
+        // if(state=="positive"){
+        //     split_positive.push(entry)
+        //     animate_path(path_id, FORWARD_LINK_COLOR);
+        // }
+        // else{
+        //     split_negative.push(entry)
+        //     animate_path(path_id, BACKWARD_LINK_COLOR);
+        // }
 
-        //vertical text over experience circles
-        try {
-          show_experience_names(element.target_id);
+        // //vertical text over experience circles
+        // try {
+        //   show_experience_names(element.target_id);
 
-        } catch (error) {
-          console.log(error);
-        }
+        // } catch (error) {
+        //   console.log(error);
+        // }
 
         // highlight relevant experiences
         d3.select("#experiences_circle-" + element.target_id)
@@ -857,14 +857,17 @@ function show_tooltip(d){
       const [x, y] = d3.pointer(event);
     
     // Calculate left and top position
-    const leftPosition = (x + tooltipWidth > svgWidth) ? (x - tooltipWidth) : x;
-    let topPosition = (y + tooltipHeight + 10 > svgHeight) ? (y - tooltipHeight) : (y + 10);
-    topPosition=+338;
+    // const leftPosition = (x + tooltipWidth > svgWidth) ? (x - tooltipWidth) : x;
+    // let topPosition = (y + tooltipHeight + 10 > svgHeight) ? (y - tooltipHeight) : (y + 10);
+    // topPosition=+338;
+
+    const leftPosition = x+100;
+    const topPosition = (y + 10);
 
     // Update tooltip position
     tooltip
-      .style("left", `${leftPosition}px`)
-      .style("top", `${topPosition}px`);
+      .style("top", `${topPosition}px`)
+      .style("left", `${leftPosition}px`);
     
     
     }
