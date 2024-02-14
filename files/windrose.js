@@ -195,17 +195,29 @@ const namez=["IA1",
 "SA2",
 "SA3"];
 
+// const valuez={
+// "IA1":10,
+// "IA2":70,
+// "IA3":15,
+// "CA1":5,
+// "CA2":100,
+// "CA3":50,
+// "CA4":45,
+// "SA1":25,
+// "SA2":67,
+// "SA3":95};
+
 const valuez={
-"IA1":10,
-"IA2":70,
-"IA3":15,
-"CA1":5,
-"CA2":100,
+"IA1":50,
+"IA2":50,
+"IA3":50,
+"CA1":50,
+"CA2":50,
 "CA3":50,
-"CA4":45,
-"SA1":25,
-"SA2":67,
-"SA3":95};
+"CA4":50,
+"SA1":50,
+"SA2":50,
+"SA3":50};
 
 // Configuration object based on your provided setup
 const windroseConfig = {
