@@ -2,6 +2,8 @@ class Windrose {
   constructor(config) {
     this.degrees = config.degrees;
     this.values = config.values;
+    this.values_list=Object.values(this.values);
+
     this.names = config.names; // Add names to the configuration
     this.windroseWidth = config.windrose_width;
     this.windroseHeight = config.windrose_height;
@@ -11,8 +13,9 @@ class Windrose {
         .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
     
     // Calculate the maximum value for scaling purposes
-    this.maxValue = Math.max(...this.values);
-    
+    // this.maxValue = Math.max(...this.values_list);
+    this.maxValue=100;
+
     // Initialize SVG
     this.initSvg();
     
@@ -46,7 +49,7 @@ degreesToRadians(degrees) {
         const endAngle = startAngle + this.degreesToRadians(degree);
         cumulativeDegrees += degree;
         
-        const outerRadius = radiusScale(this.values[i]); // Use scaled value
+        const outerRadius = radiusScale(this.values_list[i]); // Use scaled value
 
         const arc = d3.arc()
             .innerRadius(0)
@@ -119,11 +122,19 @@ degreesToRadians(degrees) {
         const x = labelRadius * Math.cos(midAngle - Math.PI / 2);
         const y = labelRadius * Math.sin(midAngle - Math.PI / 2);
 
+// console.log(activities[this.names[i]]);
+
+// let result = findElementByKey(activities, 'id', this.names[i]);
+let result=activities_dict[this.names[i]];
+console.log(result);
+
         this.svg.append("text")
             .attr("x", x)
             .attr("y", y)
             .attr("dy", ".35em")
             .style("text-anchor", midAngle > Math.PI || midAngle < 0 ? "end" : "start")
+            // .text(activities.find(obj => obj[id] === this.names[i]))
+            // .text(result)
             .text(this.names[i])
             .style("font-family", "sans-serif")
             .style("font-size", "10px")
@@ -133,14 +144,75 @@ degreesToRadians(degrees) {
     });
 }
 
+updateValuesAndRedraw(newValues) {
+  console.log("old values", this.values);
+  // Update values
+  Object.keys(newValues).forEach((key, i) => {
+    if (this.values[key] !== undefined) {
+      this.values[key] = newValues[key];
+    }
+  });
+  this.values_list=Object.values(this.values);
+
+  console.log("new values", this.values);
+
+  // Update maxValue for scaling
+  // this.maxValue = Math.max(...Object.values(this.values_list));
+
+  // Clear existing SVG content
+  d3.select(`#${this.targetDiv}`).select("svg").remove();
+
+  // Re-initialize and draw
+  this.initSvg();
+  // this.draw();
+
+  // Draw the windrose
+  this.drawSlices();
+  this.drawReferenceArcs();
+  this.drawRadialLines();
+  this.drawNames(); // Method to draw names
 }
 
+
+}
+// Function to find element based on keys
+// function findElementByKey(list, key, value) {
+//   return list.find(obj => obj[key] === value);
+// }
+function findElementByKey(list, key, value) {
+  return list.find(obj => obj[key] == value);
+}
+
+
+const namez=["IA1",
+"IA2",
+"IA3",
+"CA1",
+"CA2",
+"CA3",
+"CA4",
+"SA1",
+"SA2",
+"SA3"];
+
+const valuez={
+"IA1":10,
+"IA2":70,
+"IA3":15,
+"CA1":5,
+"CA2":100,
+"CA3":50,
+"CA4":45,
+"SA1":25,
+"SA2":67,
+"SA3":95};
 
 // Configuration object based on your provided setup
 const windroseConfig = {
   degrees: [25, 79, 37, 15, 44, 79, 30, 13, 16, 22],
-  values: [10, 70, 15, 5, 100, 50, 45, 25, 67, 95],
-  names: ["Search", "Comparison", "Sense-making", "Incrementation", "Transcription", "Modification", "Exploratory design", "Illustrate a story", "Organise a discussion", "Persuade an audience"],
+  values: valuez ,
+  // names: ["Search", "Comparison", "Sense-making", "Incrementation", "Transcription", "Modification", "Exploratory design", "Illustrate a story", "Organise a discussion", "Persuade an audience"],
+  names: namez,
   windrose_width: 400,
   windrose_height: 400,
   referenceRadius: 100,
@@ -161,7 +233,7 @@ const pieConfig = {
 // Instantiate the Windrose with the provided configuration
 new Windrose(pieConfig);
 // Instantiate the Windrose with the provided configuration
-new Windrose(windroseConfig);
+let windrose_plot=new Windrose(windroseConfig);
 
 
 

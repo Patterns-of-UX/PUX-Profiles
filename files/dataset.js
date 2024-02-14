@@ -284,6 +284,72 @@ const activities =
 
 ];
 
+
+const activities_dict = 
+  {
+    "IA1":{
+    "id": "Search",
+    "name": "IA1",
+    "size": 1,
+    "imports": ["VE1", "VE4", "SE3", "TE4"]
+  },
+  "IA2": {
+    "id": "Comparison",
+    "name": "IA2",
+    "size": 1,
+    "imports": ["VE5", "SE4", "ME4", "TE2"]
+  },
+  "IA3": {
+    "id": "Sense-making",
+    "name": "IA3",
+    "size": 1,
+    "imports": ["VE2", "VE3", "SE1", "ME1", "ME3", "TE3", "TE5"]
+  },
+  "CA1":{
+    "id": "Incrementation",
+    "name": "CA1",
+    "size": 1,
+    "imports": ["IE1", "PE6"]
+  },
+  "CA2": {
+    "id": "Transcription",
+    "name": "CA2",
+    "size": 1,
+    "imports": ["ME2", "IE2", "IE3", "IE5", "PE2", "PE5"]
+  },
+  "CA3": {
+    "id": "Modification",
+    "name": "CA3",
+    "size": 1,
+    "imports": ["SE2", "ME5", "IE4", "TE1", "PE1", "CE1"]
+  },
+ "CA4":{
+    "id": "Exploratory design",
+    "name": "CA4",
+    "size": 1,
+    "imports": ["TE5", "PE3", "PE4", "CE2", "CE3", "CE4"]
+  },
+  "SA1":{
+    "id": "Illustrate a story",
+    "name": "SA1",
+    "size": 1,
+    "imports": ["VE2", "VE4", "IE6", "TE1", "CE3"]
+  },
+  "SA2": {
+    "id": "Organise a discussion",
+    "name": "SA2",
+    "size": 1,
+    "imports": ["ME5", "IE2", "TE2", "PE3", "PE4", "CE4"]
+  },
+ "SA3":{
+    "id": "Persuade an audience",
+    "name": "SA3",
+    "size": 1,
+    "imports": ["VE3", "SE4", "ME2", "ME6", "IE5", "TE3", "TE5"]
+  }
+
+  };
+
 const secondaryData=[
     {'name': 'IE1','in': ['PE1', 'IE2', 'PE3', 'IE3'],'out': ['CE4', 'ME1']},
     {'name': 'IE2', 'in': ['ME2', 'PE6'], 'out': ['PE2', 'SE2']},

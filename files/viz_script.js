@@ -7,7 +7,7 @@ const activitiesWithChildren = activities;
 // Set dimensions
 const width = 500;
 const height = 1000;
-const padding=20;
+const padding=10;
 
 const STROKE_COLOR_ON = "green";
 const STROKE_COLOR_OFF = "#555";
@@ -22,12 +22,12 @@ const OPACITY_ON = 1;
 const OPACITY_OFF = 0.2;
 
 
-const START_POSITIVE_X =width/2; // regulates x axis position of activities
+const START_POSITIVE_X =width/2-50; // regulates x axis position of activities
 
 
 const START_NEGATIVE_X = 0; //idk
 
-const START_Y = width*0.8; // regulates x abis position of experiences
+const START_Y = width*0.95; // regulates x abis position of experiences
 
 const EXP_ID_TXT=START_Y-15; // location of the experience id locs
 
@@ -84,7 +84,7 @@ const yScale = d3
 
 // Line generator for curvy lines
 const line = d3.line().curve(d3.curveBasis);
-const controlPointFactor = 0.9; // Adjust this factor to control the sharpness
+const controlPointFactor = 0.75; // Adjust this factor to control the sharpness
 
 // Draw lines connecting ACTIVITIES and EXPERIENCES
 activities.forEach((activity) => {
@@ -99,10 +99,12 @@ activities.forEach((activity) => {
     // ];
 
     const points = [
-      [Y_EXPERIENCES, yScale(activity.name)],
+      [Y_EXPERIENCES+10, yScale(activity.name)],
       [
         (Y_EXPERIENCES + Y_ACTIVITIES) / 2,
-        interpolate(yScale(activity.name), xScale(child), controlPointFactor),
+        interpolate(yScale(activity.name),
+        
+        xScale(child), controlPointFactor),
       ],
       [Y_ACTIVITIES, xScale(child)],
     ];
@@ -275,7 +277,7 @@ svg
   .attr("y", (d) => parseInt(xScale(d)) - ICON_WIDTH / 2)
   .attr("width", ICON_WIDTH)
   .attr("height", ICON_HEIGHT);
-  
+
   // .attr("transform", (d) => {
   //   const xCenter =248 ;
   //   const yCenter = parseInt(xScale(d));

@@ -48,18 +48,42 @@ flex: 0 0 auto;
     font-weight: bold;
 }
 
-.likert-container {
-    margin-bottom: 0.5em;
+#likerts {
+    padding-top: 0.9em;
+    font-size: 10px;
 }
+
+.likert-container {
+    display: flex; /* Enables flexbox layout */
+    align-items: center; /* Aligns items vertically in the center */
+    padding-top: 0.16em;
+    margin-bottom: 0.5em; /* Adjusted to your existing margin */
+}
+
+.exp-name {
+    flex: 0 0 auto; /* Do not grow or shrink, but keeps its original size */
+    margin-right: 20px; /* Space between the experiment name and the Likert scale */
+    white-space: nowrap; /* Prevents the name from wrapping */
+    min-width: 1em; /* Minimum width in em */
+    max-width: 1em; /* Maximum width in em, equal to min-width for a fixed effect */  
+
+}
+
+.likert-scale {
+    flex: 1 0 auto; /* Allows the Likert scale to fill the rest of the space */
+    display: flex; /* Ensures the scale items are displayed inline */
+    align-items: center; /* Vertically aligns items in the center */
+}
+
 .likert-label {
     display: inline-block;
-    min-width: 80;
+    min-width: 80px; /* Ensure you specify the unit, e.g., px */
     text-align: center;
+    margin: 0 5px; /* Ensures labels are centered and spaced appropriately */
 }
+
 .textbox {
     margin-left: 5px;
-}
-#likerts{
-    font-size: 10px;
- 
+    
+    flex-grow: 1; /* Allows the textbox to grow and fill available space */
 }
