@@ -828,11 +828,12 @@ d3.selectAll(".experience_circle").each(function (d, i) {
 }
 
 
-function show_tooltip(d){
+function show_tooltip(d, pointer=false){
 
     // Create tooltip
     const tooltip = d3.select("body").append("div")
       .attr("id", "tooltip")
+      .attr("align", "right")
       .style("position", "absolute")
       .style("background-color", "white")
       // .style("border", "1px solid black")
@@ -852,22 +853,29 @@ function show_tooltip(d){
       const tooltipDimensions = tooltip.node().getBoundingClientRect();
       const tooltipWidth = tooltipDimensions.width;
       const tooltipHeight = tooltipDimensions.height;
-      
+
+      let [x, y]=d3.pointer(event);
       // Mouse position
-      const [x, y] = d3.pointer(event);
-    
+      if (pointer){
+        // x=d3.select("#experiences_circle-"+d).attr("cx");
+        // y=d3.select("#experiences_circle-"+d).attr("cy");
+        x=d3.select("#experiences_circle-"+d).attr("cx")/1;
+         y=d3.select("#experiences_circle-"+d).attr("cy")/1;
+        console.log("BUONGIORNO",d,x,y);
+      }
+     
     // Calculate left and top position
     // const leftPosition = (x + tooltipWidth > svgWidth) ? (x - tooltipWidth) : x;
     // let topPosition = (y + tooltipHeight + 10 > svgHeight) ? (y - tooltipHeight) : (y + 10);
     // topPosition=+338;
 
-    const leftPosition = x+100;
-    const topPosition = (y + 10);
+    const leftPosition = x+375;
+    const topPosition = (y-90);
 
     // Update tooltip position
     tooltip
-      .style("top", `${topPosition}px`)
-      .style("left", `${leftPosition}px`);
+      .style("bottom", `${height-topPosition}px`)
+      .style("right", `${leftPosition}px`);
     
     
     }

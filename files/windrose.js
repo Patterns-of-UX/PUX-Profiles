@@ -225,8 +225,8 @@ const windroseConfig = {
   values: valuez ,
   // names: ["Search", "Comparison", "Sense-making", "Incrementation", "Transcription", "Modification", "Exploratory design", "Illustrate a story", "Organise a discussion", "Persuade an audience"],
   names: namez,
-  windrose_width: 400,
-  windrose_height: 400,
+  windrose_width: 300,
+  windrose_height: 300,
   referenceRadius: 100,
   target_div: "windrose-svg" // ID of the div where the SVG should be appended
 };

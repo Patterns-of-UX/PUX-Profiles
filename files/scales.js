@@ -82,3 +82,39 @@ function drawScale(id) {
 
 // Example usage
 // updateScale("CA1", -5);
+
+
+d3.selectAll(".likert-scale")
+.on("mouseover", function (event, d) {
+        clean_activities_paths(); //targets activity paths only (optional)
+
+    let target=d3.select(this).attr('id').substring(0,3);
+    show_tooltip(target,true);
+    d3.selectAll(".experience_circle").style("opacity", OPACITY_OFF);
+    d3.select("#experiences_circle-"+target).style("opacity", OPACITY_ON);
+    find_experience_parents(target);
+    icon_zoom(target);
+    set_html_text(target, 'experience');
+
+    console.log("experiences_circle-"+target,OPACITY_ON);
+
+})
+.on("mouseout", function (event, d) {
+    let target=d3.select(this).attr('id').substring(0,3);
+
+    d3.select("#tooltip").remove();
+
+    fade_activities_paths(3000);
+
+    icon_dezoom(target);
+
+
+    //remove vertical text over circles
+    d3.selectAll(".experience_names").remove();
+
+    d3.selectAll(".experience_circle")
+    .style("opacity",OPACITY_ON);
+
+    clear_html_text();
+
+});

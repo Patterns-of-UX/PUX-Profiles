@@ -11,7 +11,7 @@ function createLikertScale() {
         
         questionDiv.innerHTML = `
             <div class="exp-name">[${exp_list[i].name}]</div>
-            <div class="likert-scale">
+            <div class="likert-scale" id="${exp_list[i].name}_likert_group">
                 <label class="likert-label">Strongly Disagree</label>
                 <input type="radio" name="${exp_list[i].name}_likert" value="-2">
                 <input type="radio" name="${exp_list[i].name}_likert" value="-1">

@@ -27,7 +27,7 @@ const START_POSITIVE_X =width/2-50; // regulates x axis position of activities
 
 const START_NEGATIVE_X = 0; //idk
 
-const START_Y = width*0.95; // regulates x abis position of experiences
+const START_Y = width*0.92; // regulates x abis position of experiences
 
 const EXP_ID_TXT=START_Y-15; // location of the experience id locs
 
@@ -190,8 +190,8 @@ svg
   .append("text")
   .attr("class", "activities_txt")
   .style("pointer-events", "none")
-  .attr("x", Y_EXPERIENCES+42)
-  .attr("y",(d) => yScale(d.name) )
+  .attr("x", Y_EXPERIENCES-14)
+  .attr("y",(d) => yScale(d.name)+3 )
   .attr("text-anchor", "middle")
   .style("font-size", "8px") // Original font size
   .style("fill", "darkgray") // Original color
@@ -206,8 +206,8 @@ svg
   .append("text")
   .attr("class", "activities_txt")
   .style("pointer-events", "none")
-  .attr("x",Y_EXPERIENCES+33 )
-  .attr("y",(d) => yScale(d.name) )
+  .attr("x",Y_EXPERIENCES +10)
+  .attr("y",(d) => yScale(d.name) +35)
   .attr("text-anchor", "middle")
   .text((d) => d.id)
   .attr("id", (d) => `activity-${d.name}`);
@@ -298,11 +298,13 @@ svg
   .style("pointer-events", "none")
   .style("font-size", "8px") // Original font size
   .style("fill", "darkgray") // Original color
-  .attr("x", EXP_ID_TXT)
+  .attr("x", EXP_ID_TXT+45)
   .attr("y", (d) => xScale(d))
   .attr("text-anchor", "middle")
   .text((d) => d)
+  .attr("transform", (d) => `rotate(90, ${EXP_ID_TXT+45}, ${xScale(d)})`) // Rotate 90 degrees
   .attr("id", (d) => `experience-${d}`);
+
 
   let topLayer = d3.select("#topLayer");  // Create or select a top layer group
   if (topLayer.empty()) {
@@ -311,7 +313,9 @@ svg
 
   var isClicked = false; // Flag to track click state
 
+
  
+  
 d3.selectAll(".experience_circle")
   .on("mouseover", function (event, d) {
     if (isClicked) { 
@@ -335,7 +339,7 @@ d3.selectAll(".experience_circle")
     // experience_sentiments_bullets(d); // bullets for positive and negative experience correlations
     find_experience_parents(d);
     icon_zoom(d);
-
+console.log("tooltip", d);
     show_tooltip(d);
 
   })
@@ -347,10 +351,10 @@ d3.selectAll(".experience_circle")
 
     clear_html_text();
    
-    // clean_experience_paths();  //targets experience paths and circles
+   // clean_experience_paths();  //targets experience paths and circles
     //fade_experience_paths(3000)
     // clean_activities_paths(); //targets activity paths only (optional)
-    // fade_activities_paths(3000);
+     fade_activities_paths(3000);
 
     icon_dezoom(d);
 
@@ -358,6 +362,9 @@ d3.selectAll(".experience_circle")
 
     //remove vertical text over circles
     d3.selectAll(".experience_names").remove();
+
+    d3.selectAll(".experience_circle")
+    .style("opacity",OPACITY_ON);
 
   });
 
