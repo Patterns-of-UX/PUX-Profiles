@@ -118,3 +118,40 @@ d3.selectAll(".likert-scale")
     clear_html_text();
 
 });
+
+const gridContainer = document.getElementById('data-grid');
+const variables = namez; // Ensure 'namez' is defined earlier in your code as an array of variable names
+
+variables.forEach((variable) => {
+  const label = document.createElement('label');
+  label.textContent = variable + ':';
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = '% of time spent';
+  input.className = 'input-small';
+  
+  gridContainer.appendChild(label);
+  gridContainer.appendChild(input);
+});
+
+
+// const gridContainer = document.getElementById('data-grid');
+// const variables = namez; // Ensure 'namez' is defined earlier in your code as an array of variable names
+
+// variables.forEach((variable) => {
+//   // Create label for variable name
+//   const label = document.createElement('label');
+//   label.textContent = variable + ':';
+//   label.style.minWidth = '10px'; // Adjust label width as needed
+  
+//   // Create input field for data
+//   const input = document.createElement('input');
+//   input.type = 'text';
+//   input.placeholder = '% of time spent'; // Set placeholder text
+//   input.className = 'input-small'; // Use class for styling
+  
+//   // Append label and input to grid container
+//   gridContainer.appendChild(label);
+//   gridContainer.appendChild(input);
+// });

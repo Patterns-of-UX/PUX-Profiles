@@ -236,8 +236,8 @@ const pieConfig = {
   values: [100, 100, 100, 100, 100, 100, 100, 100, 100,100],
   // names: ["Search", "Comparison", "Sense-making", "Incrementation", "Transcription", "Modification", "Exploratory design", "Illustrate a story", "Organise a discussion", "Persuade an audience"],
   names:[],
-  windrose_width: 300,
-  windrose_height: 300,
+  windrose_width: 170,
+  windrose_height: 170,
   referenceRadius: 80,
   target_div: "pie-svg" // ID of the div where the SVG should be appended
 };

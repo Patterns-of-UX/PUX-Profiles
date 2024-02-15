@@ -77,13 +77,44 @@ flex: 0 0 auto;
 
 .likert-label {
     display: inline-block;
-    min-width: 80px; /* Ensure you specify the unit, e.g., px */
+    min-width: 50px; /* Ensure you specify the unit, e.g., px */
     text-align: center;
     margin: 0 5px; /* Ensures labels are centered and spaced appropriately */
 }
 
 .textbox {
-    margin-left: 5px;
-    
+    margin-left: 0px;
     flex-grow: 1; /* Allows the textbox to grow and fill available space */
 }
+#container-pie {
+    display: flex; /* Aligns children divs side by side */
+  }
+
+  #data-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 2px; /* Reduced gap between grid items */
+    max-width: 250px; /* Reduced width to make the grid narrower */
+    min-width: 130px; /* Reduced width to make the grid narrower */
+    font-size: 12px; /* Smaller font size overall */
+  }
+  
+  #data-grid label {
+    text-align: right;
+    padding-right: 2px;
+    white-space: nowrap; /* Prevent wrapping of text */
+    min-width: 10px; /* Adjust label width as needed */
+  }
+  
+  .input-small {
+    width: 100%; /* Adjusted to fill the reduced column width */
+    padding: 1px; /* Further reduced padding to decrease input height */
+  }
+
+  #pie-svg {
+    /* Add styles here for the SVG container if needed */
+    width: 200px; /* Example width */
+    height: 200px; /* Example height */
+    margin-top: 50px; /* Space between the grid and SVG */
+    margin-left: 20px; /* Space between the grid and SVG */
+  }
