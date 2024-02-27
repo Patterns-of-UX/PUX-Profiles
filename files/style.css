@@ -12,18 +12,56 @@ text {
 #container {
     display: flex;
 }
+#text-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 22em; 
+    /* max-width: 22.75em;  */
+ }
+
+#pie-svg{
+    padding-left: 1.7em;
+}
+
+
+ /* #text-container {
+    display: flex; /* Enable Flexbox */
+   /*  justify-content: flex-end; /* Align child elements to the end (right) */
+   /*  flex-direction: column; /* Keeps the original column layout */
+/* } */
+
+/* #right-align-wrapper {
+    display: flex;
+    justify-content: flex-end; /* Aligns child to the right */
+ /*   width: 100%; /* Ensures the wrapper takes full width of its parent */
+/*} */
+
+#right-align-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 22.75em; 
+    max-width: 22.75em; 
+}
+
+#left_panel_text {
+    padding-left: 1em;
+
+    /* If specific width is needed, define it here to ensure it aligns right properly */
+    width: auto; /* Adjust based on content or specific requirements */
+}
+
+
+
+
+
 
 #svg-container {
     flex: 0 0 auto;
 }
 
-#text-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 18.75em; /* Minimum width in em */
-    max-width: 18.75em; /* Maximum width in em, equal to min-width for a fixed effect */  
-}
+
 
 #left_panel_text{
     min-height: 20em; /* Minimum width in em */
@@ -91,19 +129,26 @@ flex: 0 0 auto;
   }
 
   #data-grid {
+    width: 100%;
     display: grid;
     grid-template-columns: auto auto;
     gap: 2px; /* Reduced gap between grid items */
-    max-width: 250px; /* Reduced width to make the grid narrower */
-    min-width: 130px; /* Reduced width to make the grid narrower */
+    /* max-width: 220px; Reduced width to make the grid narrower */
     font-size: 12px; /* Smaller font size overall */
+    align-self: center; /* This will center the grid in the flex container */
+
   }
   
+  #data-grid input {
+    max-width: 10em;
+    /* padding-right: 0.5em; */
+  }
+
   #data-grid label {
-    text-align: right;
+    /* text-align: right; */
     padding-right: 2px;
+    padding-top: 5px;
     white-space: nowrap; /* Prevent wrapping of text */
-    min-width: 10px; /* Adjust label width as needed */
   }
   
   .input-small {
@@ -111,10 +156,40 @@ flex: 0 0 auto;
     padding: 1px; /* Further reduced padding to decrease input height */
   }
 
-  #pie-svg {
-    /* Add styles here for the SVG container if needed */
-    width: 200px; /* Example width */
-    height: 200px; /* Example height */
-    margin-top: 50px; /* Space between the grid and SVG */
-    margin-left: 20px; /* Space between the grid and SVG */
+  /* #pie-svg {
+    width: 200px;
+    height: 200px; 
+    margin-top: 50px; 
+    margin-left: 20px;
   }
+ */
+
+
+  #centered-container {
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center items horizontally */
+    flex-wrap: wrap; /* Allows wrapping, not typically needed with column direction */
+}
+
+/* #windrose-svg, #pie-svg {
+    width: 200px; /* Adjust width as necessary */
+  /*  height: 200px; /* Adjust height as necessary */
+   /* margin-bottom: 20px; /* Adds space between the two divs */
+   /* text-align: center; /* Center content inside each div */
+/*} */
+
+#data-grid {
+    /* Existing styles */
+    align-self: center; /* This will center the grid in the flex container */
+}
+
+#vertical-stack {
+    display: flex;
+    flex-direction: column; /* Stacks children vertically */
+    align-items: center; /* Centers them horizontally */
+}
+
+#vertical-stack > div {
+    margin-bottom: 20px; /* Adds space between vertically stacked divs */
+}

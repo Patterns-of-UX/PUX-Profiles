@@ -119,21 +119,21 @@ d3.selectAll(".likert-scale")
 
 });
 
-const gridContainer = document.getElementById('data-grid');
-const variables = namez; // Ensure 'namez' is defined earlier in your code as an array of variable names
+// const gridContainer = document.getElementById('data-grid');
+// const variables = namez; // Ensure 'namez' is defined earlier in your code as an array of variable names
 
-variables.forEach((variable) => {
-  const label = document.createElement('label');
-  label.textContent = variable + ':';
+// variables.forEach((variable) => {
+//   const label = document.createElement('label');
+//   label.textContent = variable+" "+PUX_COMPLETE[variable].name;
   
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.placeholder = '% of time spent';
-  input.className = 'input-small';
-  
-  gridContainer.appendChild(label);
-  gridContainer.appendChild(input);
-});
+//   const input = document.createElement('input');
+//   input.type = 'text';
+//   input.placeholder = '% of time spent';
+//   input.className = 'input-small';
+
+//   gridContainer.appendChild(input);
+//   gridContainer.appendChild(label);
+// });
 
 
 // const gridContainer = document.getElementById('data-grid');

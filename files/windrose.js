@@ -3,7 +3,7 @@ class Windrose {
     this.degrees = config.degrees;
     this.values = config.values;
     this.values_list=Object.values(this.values);
-
+    this.repulsion_force=config.repulsion_force;
     this.names = config.names; // Add names to the configuration
     this.windroseWidth = config.windrose_width;
     this.windroseHeight = config.windrose_height;
@@ -21,7 +21,10 @@ class Windrose {
     
     // Draw the windrose
     this.drawSlices();
-    this.drawReferenceArcs();
+    if(this.targetDiv=="windrose-svg"){
+      this.drawReferenceArcs();
+    }
+
     this.drawRadialLines();
     this.drawNames(); // Method to draw names
 }
@@ -93,8 +96,8 @@ degreesToRadians(degrees) {
           cumulativeDegrees += degree;
 
           const drawLine = (angle) => {
-              const lineEndX = (this.referenceRadius + 20) * Math.cos(angle - Math.PI / 2);
-              const lineEndY = (this.referenceRadius + 20) * Math.sin(angle - Math.PI / 2);
+              const lineEndX = (this.referenceRadius*1.05) * Math.cos(angle - Math.PI / 2);
+              const lineEndY = (this.referenceRadius*1.05) * Math.sin(angle - Math.PI / 2);
 
               this.svg.append("line")
                   .attr("x1", 0)
@@ -102,7 +105,7 @@ degreesToRadians(degrees) {
                   .attr("x2", lineEndX)
                   .attr("y2", lineEndY)
                   .style("stroke", "black")
-                  .style("stroke-width", 1)
+                  .style("stroke-width", 0.5)
                   .style("stroke-dasharray", "3, 3");
           };
 
@@ -113,36 +116,180 @@ degreesToRadians(degrees) {
       });
   }
 
-
+  //this.targetDiv
+  
   drawNames() {
     let cumulativeDegrees = 0;
+    const texts = []; // Array to store text element data for force simulation
+
     this.degrees.forEach((degree, i) => {
         const midAngle = this.degreesToRadians(cumulativeDegrees + degree / 2);
-        const labelRadius = this.referenceRadius + 10; // Offset for labels outside the arcs
+        const labelRadius = this.referenceRadius*1.1; // Adjusted for potential force simulation movement
         const x = labelRadius * Math.cos(midAngle - Math.PI / 2);
         const y = labelRadius * Math.sin(midAngle - Math.PI / 2);
 
-// console.log(activities[this.names[i]]);
+        let result = activities_dict[this.names[i]];
 
-// let result = findElementByKey(activities, 'id', this.names[i]);
-let result=activities_dict[this.names[i]];
-console.log(result);
-
-        this.svg.append("text")
-            .attr("x", x)
-            .attr("y", y)
-            .attr("dy", ".35em")
-            .style("text-anchor", midAngle > Math.PI || midAngle < 0 ? "end" : "start")
-            // .text(activities.find(obj => obj[id] === this.names[i]))
-            // .text(result)
-            .text(this.names[i])
-            .style("font-family", "sans-serif")
-            .style("font-size", "10px")
-            .style("fill", "black");
+        const textData = {
+            x: x,
+            y: y,
+            name: this.names[i],
+            id: findEntryByName(this.names[i]).id + "_pie_text"
+        };
+        texts.push(textData);
 
         cumulativeDegrees += degree;
     });
+
+    // After collecting all texts, apply the force layout
+    this.applyForceLayout(texts);
 }
+applyForceLayout(textData) {
+  // let repulsion = this.repulsion_force;
+  const center = { x: 0, y: 0 }; // Adjust if your center is different
+  let minRadius = this.referenceRadius * 1.55; // Define minimum radius
+  let maxRadius = this.referenceRadius * 1.9; // Define maximum radius
+
+  let collider=3;
+  let repulsion =0;
+
+  if(this.targetDiv=="windrose-svg"){
+    minRadius = this.referenceRadius * 1.2; // Define minimum radius
+    maxRadius = this.referenceRadius * 1.4; // Define maximum radius
+    collider=5;
+    repulsion=0;
+  
+  }
+
+  const simulation = d3.forceSimulation(textData)
+      .force("charge", d3.forceManyBody().strength(repulsion)) // Slight repulsion to avoid overlap
+      .force("center", d3.forceCenter(center.x, center.y)) // Centering force; adjust as needed
+      .force("collision", d3.forceCollide().radius(collider)) // Prevents text elements from overlapping
+      .on("tick", ticked)
+      .alphaDecay(0.05) // Adjusts how quickly the simulation cools down
+      .alpha(0.3); // Starting alpha, affects how simulation starts
+
+  const svgTexts = this.svg.selectAll(".pie-text")
+      .data(textData)
+      .enter().append("text")
+      .attr("class", "pie-text")
+      .attr("id", d => d.id)
+      .text(d => d.name)
+      .style("text-anchor", "middle")
+      .style("font-family", "sans-serif")
+      .style("font-size", "10px")
+      .style("fill", "black");
+
+  // function ticked() {
+  //   svgTexts.each(function(d) {
+  //     const dx = d.x - center.x;
+  //     const dy = d.y - center.y;
+  //     const distance = Math.sqrt(dx * dx + dy * dy);
+  //     if (distance) {
+  //       const clampedDistance = Math.max(minRadius, Math.min(maxRadius, distance));
+  //       const scale = clampedDistance / distance;
+  //       d.x = center.x + dx * scale;
+  //       d.y = center.y + dy * scale;
+  //     }
+  //   })
+  //   .attr("x", d => d.x)
+  //   .attr("y", d => d.y);
+  // }
+
+  function ticked() {
+    svgTexts.each(function(d, i) {
+      const dx = d.x - center.x;
+      const dy = d.y - center.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance) {
+        // Clamp radial distance
+        const clampedDistance = Math.max(minRadius, Math.min(maxRadius, distance));
+        const scale = clampedDistance / distance;
+        let newX = center.x + dx * scale;
+        let newY = center.y + dy * scale;
+  
+        // Attempt to maintain angular position
+        const originalAngle = Math.atan2(textData[i].y - center.y, textData[i].x - center.x);
+        const newAngle = Math.atan2(newY - center.y, newX - center.x);
+        const angleDiff = originalAngle - newAngle;
+  
+        if (Math.abs(angleDiff) > Math.PI / 180) { // Adjust threshold as needed
+          newX = center.x + Math.cos(originalAngle) * clampedDistance;
+          newY = center.y + Math.sin(originalAngle) * clampedDistance;
+        }
+  
+        d.x = newX;
+        d.y = newY;
+      }
+    })
+    .attr("x", d => d.x)
+    .attr("y", d => d.y);
+  }
+  
+
+
+}
+
+
+// applyForceLayout(textData) {
+//   const repulsion=this.repulsion_force;
+//   const simulation = d3.forceSimulation(textData)
+//       .force("charge", d3.forceManyBody().strength(7)) // Repel text elements slightly
+//       .force("center", d3.forceCenter(0,0)) // Centering force
+//       .force("collision", d3.forceCollide().radius(function(d) {
+//           return repulsion; // Adjust as needed based on text size
+//       }))
+//       .on("tick", ticked);
+
+//   const svgTexts = this.svg.selectAll(".pie-text")
+//       .data(textData)
+//       .enter().append("text")
+//       .text(d => d.name)
+//       .attr("class", "pie-text")
+//       .attr("id", d => d.id)
+//       .style("text-anchor", "middle")
+//       .style("font-family", "sans-serif")
+//       .style("font-size", "10px")
+//       .style("fill", "black");
+
+//   function ticked() {
+//       svgTexts
+//           .attr("x", d => d.x)
+//           .attr("y", d => d.y);
+//   }
+// }
+
+//   drawNames() {
+//     let cumulativeDegrees = 0;
+//     this.degrees.forEach((degree, i) => {
+//         const midAngle = this.degreesToRadians(cumulativeDegrees + degree / 2);
+//         const labelRadius = this.referenceRadius + 10; // Offset for labels outside the arcs
+//         const x = labelRadius * Math.cos(midAngle - Math.PI / 2);
+//         const y = labelRadius * Math.sin(midAngle - Math.PI / 2);
+
+// // console.log(activities[this.names[i]]);
+
+// // let result = findElementByKey(activities, 'id', this.names[i]);
+// let result=activities_dict[this.names[i]];
+// console.log(result);
+
+//         this.svg.append("text")
+//             .attr("x", x)
+//             .attr("y", y)
+//             .attr("dy", ".35em")
+//             .style("text-anchor", midAngle > Math.PI || midAngle < 0 ? "end" : "start")
+//             // .text(activities.find(obj => obj[id] === this.names[i]))
+//             // .text(result)
+//             .text(this.names[i])
+//             .attr("class", "pie-text")
+//             .attr("id",  findEntryByName(this.names[i]).id+"_pie_text")
+//             .style("font-family", "sans-serif")
+//             .style("font-size", "10px")
+//             .style("fill", "black");
+
+//         cumulativeDegrees += degree;
+//     });
+// }
 
 updateValuesAndRedraw(newValues) {
   console.log("old values", this.values);
@@ -184,6 +331,22 @@ function findElementByKey(list, key, value) {
 }
 
 
+function findEntryByName(name) {
+  // Iterate through the dictionary to find the entry with the specified name
+  for (const key in PUX_COMPLETE) {
+    if (PUX_COMPLETE.hasOwnProperty(key)) {
+      const entry = PUX_COMPLETE[key];
+      if (entry.name === name) {
+        return entry;
+      }
+    }
+  }
+  return null; // Return null if no entry is found
+}
+
+
+
+
 const namez=["IA1",
 "IA2",
 "IA3",
@@ -221,32 +384,293 @@ const valuez={
 
 // Configuration object based on your provided setup
 const windroseConfig = {
-  degrees: [25, 79, 37, 15, 44, 79, 30, 13, 16, 22],
+  // degrees: [25, 79, 37, 15, 44, 79, 30, 13, 16, 22],
+  degrees:new Array(namez.length).fill(36),
   values: valuez ,
   // names: ["Search", "Comparison", "Sense-making", "Incrementation", "Transcription", "Modification", "Exploratory design", "Illustrate a story", "Organise a discussion", "Persuade an audience"],
-  names: namez,
-  windrose_width: 300,
+  // names: namez,
+  names: namez.map(variable => PUX_COMPLETE[variable].name),
+  windrose_width: 410,
   windrose_height: 300,
   referenceRadius: 100,
+  repulsion_force:2,
   target_div: "windrose-svg" // ID of the div where the SVG should be appended
 };
-// Configuration object based on your provided setup
-const pieConfig = {
-  degrees: [25, 79, 37, 15, 44, 79, 30, 13, 16, 22],
-  values: [100, 100, 100, 100, 100, 100, 100, 100, 100,100],
-  // names: ["Search", "Comparison", "Sense-making", "Incrementation", "Transcription", "Modification", "Exploratory design", "Illustrate a story", "Organise a discussion", "Persuade an audience"],
-  names:[],
-  windrose_width: 170,
-  windrose_height: 170,
-  referenceRadius: 80,
-  target_div: "pie-svg" // ID of the div where the SVG should be appended
-};
 
-// Instantiate the Windrose with the provided configuration
-new Windrose(pieConfig);
 // Instantiate the Windrose with the provided configuration
 let windrose_plot=new Windrose(windroseConfig);
 
+
+
+
+
+// Assuming 'gridContainer' is already defined
+const gridContainer = document.getElementById('data-grid');
+
+// Create a container for the persona label and input
+const personaContainer = document.createElement('div');
+personaContainer.style.textAlign = 'center'; // Center the contents of the container
+personaContainer.style.marginBottom = '20px'; // Add some space below the container
+
+// Create a label for the "Persona" input
+const personaLabel = document.createElement('label');
+personaLabel.textContent = 'Persona: ';
+personaLabel.style.marginRight = '10px'; // Add some space between the label and the input
+
+// Create the input field for "Persona"
+const personaInput = document.createElement('input');
+personaInput.type = 'text';
+personaInput.placeholder = 'Input your role';
+personaInput.className = 'input-large'; // Use this class for styling or specify inline styles
+
+// Append the label and input to the container
+personaContainer.appendChild(personaLabel);
+personaContainer.appendChild(personaInput);
+
+// Insert the persona container before the grid container
+gridContainer.parentNode.insertBefore(personaContainer, gridContainer);
+
+
+const variables = namez; // Ensure 'namez' is an array of variable names
+const inputValues = new Array(variables.length).fill(10); // Initialize input values with 0
+
+// Initialize pieConfig with empty degrees array
+let pieConfig = {
+  degrees: new Array(variables.length).fill(36),
+  values: new Array(variables.length).fill(100),
+  names: variables.map(variable => PUX_COMPLETE[variable].name),
+  windrose_width: 350,
+  windrose_height: 250,
+  referenceRadius: 50,
+  repulsion_force:1,
+  target_div: "pie-svg"
+};
+
+// Function to update or create a message about the sum of percentages
+function updateSumMessage(sum) {
+  let sumMessageDiv = document.getElementById('sum-message');
+  const remainingPercentage = 100 - sum;
+
+  // Ensure sumMessageDiv exists
+  if (!sumMessageDiv) {
+      sumMessageDiv = document.createElement('div');
+      sumMessageDiv.id = 'sum-message';
+      document.body.appendChild(sumMessageDiv);
+  }
+
+  // Update the message based on the sum
+  if (sum > 100) {
+      sumMessageDiv.textContent = `The total exceeds 100%. Please adjust the values to decrease the total by ${remainingPercentage * -1}%.`;
+  } else if (sum < 100) {
+      sumMessageDiv.textContent = `You have ${remainingPercentage}% left to allocate.`;
+  } else { // sum is exactly 100
+      sumMessageDiv.textContent = 'Perfect! The sum of all values is exactly 100%.';
+
+      clearSvgElements('windrose-svg');
+      windroseConfig.degrees = pieConfig.degrees;
+
+     windrose_plot=new Windrose(windroseConfig);
+
+  }
+}
+
+
+
+// Function to clear SVG elements in "pie-svg" div
+function clearSvgElements(div_id) {
+  const svgContainer = document.getElementById(div_id);
+  while (svgContainer.firstChild) {
+    svgContainer.removeChild(svgContainer.firstChild);
+  }
+}
+
+let isFirstInput = true; // Flag to check if any input has been provided
+variables.forEach((variable, index) => {
+  const label = document.createElement('label');
+  label.textContent = variable + " " + PUX_COMPLETE[variable].name;
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = '% of time spent';
+  input.className = 'input-small';
+  
+  // Event listener to update degrees based on percentage input and check sum
+  input.addEventListener('input', () => {
+    if (isFirstInput) {
+      // Reset degrees to 0 for all variables upon the first input
+      pieConfig.degrees = variables.map(() => 0);
+      isFirstInput = false; // Update flag so this block doesn't run again
+    }
+
+    const percentage = parseFloat(input.value) || 0; // Parse input value or default to 0
+    pieConfig.degrees[index] = percentage * 3.6; // Update degree based on the input
+
+    // Calculate sum of percentages
+    const sum = pieConfig.degrees.reduce((acc, curr) => acc + curr / 3.6, 0);
+    updateSumMessage(sum); // Update or create the sum message based on the new sum
+
+    // Clear existing SVG elements and update Windrose chart
+    clearSvgElements('pie-svg');
+    new Windrose(pieConfig);
+
+    // Gray out or restore color of the associated text element
+
+const textElementClass = findEntryByName(pieConfig.names[index]).id+"_pie_text"; // Adapt if necessary
+
+
+
+    console.log("changing text element", textElementClass);
+
+    d3.selectAll("#" + textElementClass).each(function() {
+      if (percentage === 0) {
+        d3.select(this).style("fill", "red"); // Gray out text for empty input
+      } else {
+        d3.select(this).style("fill", "black"); // Restore text color for non-empty input
+      }
+    });
+
+    checkAndHandleOverlaps();
+
+
+  });
+  
+  gridContainer.appendChild(label);
+  gridContainer.appendChild(input);
+});
+
+
+new Windrose(pieConfig);
+
+
+// function checkAndHandleOverlaps() {
+//   const textElements = document.querySelectorAll('.pie-text'); // Adjust selector as needed
+//   const boundingBoxes = [];
+
+//   // Initially set all text elements to black and fully opaque
+//   textElements.forEach(text => {
+//     text.style.fill = 'black'; // Default color
+//     text.style.opacity = '1'; // Fully opaque
+//   });
+
+//   // Get bounding boxes for all text elements
+//   textElements.forEach(text => {
+//     boundingBoxes.push(text.getBBox());
+//   });
+
+//   // Function to check if two boxes overlap and return overlap percentage
+//   const getOverlapPercentage = (box1, box2) => {
+//     const xOverlap = Math.max(0, Math.min(box1.x + box1.width, box2.x + box2.width) - Math.max(box1.x, box2.x));
+//     const yOverlap = Math.max(0, Math.min(box1.y + box1.height, box2.y + box2.height) - Math.max(box1.y, box2.y));
+//     const overlapArea = xOverlap * yOverlap;
+//     const smallestArea = Math.min(box1.width * box1.height, box2.width * box2.height);
+//     return (overlapArea / smallestArea) * 100; // Percentage of the smallest box overlapped
+//   };
+
+//   // Significant overlap threshold (in percentage of the smaller text element's area)
+//   const significantOverlapThreshold = 50; // Adjust based on your needs
+
+//   // Compare each box against all others to check for significant overlap
+//   for (let i = 0; i < boundingBoxes.length; i++) {
+//     for (let j = i + 1; j < boundingBoxes.length; j++) {
+//       const overlapPercentage = getOverlapPercentage(boundingBoxes[i], boundingBoxes[j]);
+//       if (overlapPercentage > significantOverlapThreshold) {
+//         // If there's significant overlap, adjust opacity based on the degree of overlap
+//         const opacity = Math.max(0.2, 1 - (overlapPercentage / 100));
+//         textElements[i].style.opacity = opacity.toString();
+//         textElements[j].style.opacity = opacity.toString();
+//       }
+//     }
+//   }
+// }
+
+
+function checkAndHandleOverlaps() {
+  const textElements = document.querySelectorAll('.pie-text'); // Adjust selector as needed
+  const boundingBoxes = [];
+
+  // Get bounding boxes for all text elements
+  textElements.forEach(text => {
+    boundingBoxes.push(text.getBBox());
+  });
+
+  // Function to check if two boxes overlap and return overlap percentage
+  const getOverlapPercentage = (box1, box2) => {
+    const xOverlap = Math.max(0, Math.min(box1.x + box1.width, box2.x + box2.width) - Math.max(box1.x, box2.x));
+    const yOverlap = Math.max(0, Math.min(box1.y + box1.height, box2.y + box2.height) - Math.max(box1.y, box2.y));
+    const overlapArea = xOverlap * yOverlap;
+    const smallestArea = Math.min(box1.width * box1.height, box2.width * box2.height);
+    return (overlapArea / smallestArea) * 100; // Percentage of the smallest box overlapped
+  };
+
+  // Significant overlap threshold (in percentage of the smaller text element's area)
+  const significantOverlapThreshold = 50; // Adjust based on your needs
+
+  // Compare each box against all others to check for significant overlap
+  for (let i = 0; i < boundingBoxes.length; i++) {
+    for (let j = i + 1; j < boundingBoxes.length; j++) {
+      const overlapPercentage = getOverlapPercentage(boundingBoxes[i], boundingBoxes[j]);
+      if (overlapPercentage > significantOverlapThreshold) {
+        // If there's significant overlap, change colors or apply styles
+        textElements[i].style.fill = 'red'; // Example: mark significantly overlapping elements in red
+        textElements[j].style.fill = 'red'; // Adjust as necessary
+      } else {
+        // If overlap is not significant, you can choose to explicitly set or reset styles
+        // This block can be left empty if there's no need to reset styles for minor overlaps
+      }
+    }
+  }
+}
+
+
+
+// Call this function after rendering your chart to check and handle overlaps
+checkAndHandleOverlaps();
+
+
+
+
+
+
+// Create the download button
+const downloadButton = document.createElement('button');
+downloadButton.textContent = 'Download Data';
+downloadButton.onclick = function() {
+    // Object to hold all metadata and pie chart values
+    const dataToDownload = {
+        persona: document.querySelector('input[placeholder="Input your role"]').value,
+        variables: {}
+    };
+
+    // Assuming 'variables' is your array of variable names used to generate input fields
+    variables.forEach(variable => {
+        const input = document.querySelector(`input[data-variable="${variable}"]`); // Make sure you set this custom attribute when creating inputs
+        dataToDownload.variables[variable] = input.value;
+    });
+
+    // Include pie chart values if necessary, adjust according to your needs
+    // For example, adding pieConfig.degrees (make sure to update it with actual values upon input changes)
+    dataToDownload.pieChartDegrees = pieConfig.degrees;
+
+    // Convert the data object to a JSON string
+    const jsonData = JSON.stringify(dataToDownload, null, 2);
+
+    // Trigger the download
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'metadata.json'; // Filename
+    document.body.appendChild(a); // Required for Firefox
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url); // Clean up
+};
+
+// Add the download button to the DOM, for example, below the grid or at a suitable place in your UI
+document.body.appendChild(downloadButton);
+
+
+// Instantiate the Windrose with the initial configuration
 
 
 // var degrees = [90, 10, 5, 3, 2, 180, 70]; // Degrees of each slice
