@@ -98,15 +98,30 @@ degreesToRadians(degrees) {
           const drawLine = (angle) => {
               const lineEndX = (this.referenceRadius*1.05) * Math.cos(angle - Math.PI / 2);
               const lineEndY = (this.referenceRadius*1.05) * Math.sin(angle - Math.PI / 2);
+             
 
-              this.svg.append("line")
-                  .attr("x1", 0)
-                  .attr("y1", 0)
-                  .attr("x2", lineEndX)
-                  .attr("y2", lineEndY)
-                  .style("stroke", "black")
-                  .style("stroke-width", 0.5)
-                  .style("stroke-dasharray", "3, 3");
+              if(this.targetDiv=="windrose-svg"){
+
+                this.svg.append("line")
+                .attr("x1", 0)
+                .attr("y1", 0)
+                .attr("x2", lineEndX)
+                .attr("y2", lineEndY)
+                .style("stroke", "black")
+                .style("stroke-width", 0.5)
+                .style("stroke-dasharray", "3, 3");
+              }else{
+                this.svg.append("line")
+                .attr("x1", 0)
+                .attr("y1", 0)
+                .attr("x2", lineEndX)
+                .attr("y2", lineEndY)
+                .style("stroke", "black")
+                .style("stroke-width", 0.1)
+                .style("stroke-dasharray", "3, 3");
+
+              }
+            
           };
 
           drawLine(startAngle);
@@ -123,7 +138,7 @@ degreesToRadians(degrees) {
     const texts = []; // Array to store text element data for force simulation
 
     this.degrees.forEach((degree, i) => {
-        const midAngle = this.degreesToRadians(cumulativeDegrees + degree / 2);
+        const midAngle = this.degreesToRadians(cumulativeDegrees + degree / 2)-Math.PI/8;
         const labelRadius = this.referenceRadius*1.1; // Adjusted for potential force simulation movement
         const x = labelRadius * Math.cos(midAngle - Math.PI / 2);
         const y = labelRadius * Math.sin(midAngle - Math.PI / 2);
@@ -151,13 +166,13 @@ applyForceLayout(textData) {
   let maxRadius = this.referenceRadius * 1.9; // Define maximum radius
 
   let collider=3;
-  let repulsion =0;
+  let repulsion =3;
 
   if(this.targetDiv=="windrose-svg"){
     minRadius = this.referenceRadius * 1.2; // Define minimum radius
     maxRadius = this.referenceRadius * 1.4; // Define maximum radius
     collider=5;
-    repulsion=0;
+    repulsion=3;
   
   }
 
