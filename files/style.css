@@ -17,7 +17,7 @@ text {
     display: flex;
     flex-direction: column;
     min-width: 22em; 
-    /* max-width: 22.75em;  */
+    max-width: 22.2em; 
  }
 
 #pie-svg{
@@ -94,7 +94,7 @@ flex: 0 0 auto;
 .likert-container {
     display: flex; /* Enables flexbox layout */
     align-items: center; /* Aligns items vertically in the center */
-    padding-top: 0.16em;
+    padding-top: 0.10em;
     margin-bottom: 0.5em; /* Adjusted to your existing margin */
 }
 

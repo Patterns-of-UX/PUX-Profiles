@@ -9,8 +9,23 @@ class Windrose {
     this.windroseHeight = config.windrose_height;
     this.referenceRadius = config.referenceRadius;
     this.targetDiv = config.target_div;
+    // this.color = d3.scaleOrdinal()
+    //     .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    // this.color = d3.scaleOrdinal(d3.schemeCategory10);
     this.color = d3.scaleOrdinal()
-        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    .range([
+        "#1f77b4", // muted blue
+        "#aec7e8", // light blue
+        "#ff7f0e", // bright orange
+        "#ffbb78", // light orange
+        "#2ca02c", // forest green
+        "#98df8a", // light green
+        "#d62728", // brick red
+        "#ff9896", // salmon
+        "#9467bd", // muted purple
+        "#c5b0d5"  // light purple
+    ]);
+
     
     // Calculate the maximum value for scaling purposes
     // this.maxValue = Math.max(...this.values_list);
@@ -80,9 +95,9 @@ degreesToRadians(degrees) {
           this.svg.append("path")
               .attr("d", referenceArc)
               .style("fill", "#6495ED")
-              .style("opacity", 0.25)
+              .style("opacity", 0.2)
               .style("stroke", "#ffffff")
-              .style("stroke-width", 3);
+              .style("stroke-width", 3.5);
 
           tempReferenceRadius -= 5;
       }
@@ -133,32 +148,74 @@ degreesToRadians(degrees) {
 
   //this.targetDiv
   
-  drawNames() {
+    drawNames() {
     let cumulativeDegrees = 0;
-    const texts = []; // Array to store text element data for force simulation
-
     this.degrees.forEach((degree, i) => {
-        const midAngle = this.degreesToRadians(cumulativeDegrees + degree / 2)-Math.PI/8;
-        const labelRadius = this.referenceRadius*1.1; // Adjusted for potential force simulation movement
+        const midAngle = this.degreesToRadians(cumulativeDegrees + degree / 2);
+        // const labelRadius = this.referenceRadius + 10; // Offset for labels outside the arcs
+        let radius_multiplier=1.1;
+
+        if(this.targetDiv=="pie-svg"){
+          radius_multiplier=1.2;
+        }
+        const labelRadius = this.referenceRadius*radius_multiplier; // Adjusted for potential force simulation movement
+
         const x = labelRadius * Math.cos(midAngle - Math.PI / 2);
         const y = labelRadius * Math.sin(midAngle - Math.PI / 2);
 
-        let result = activities_dict[this.names[i]];
+        // console.log(activities[this.names[i]]);
 
-        const textData = {
-            x: x,
-            y: y,
-            name: this.names[i],
-            id: findEntryByName(this.names[i]).id + "_pie_text"
-        };
-        texts.push(textData);
+        // let result = findElementByKey(activities, 'id', this.names[i]);
+        let result=activities_dict[this.names[i]];
+        console.log(result);
+
+        this.svg.append("text")
+            .attr("x", x)
+            .attr("y", y)
+            .attr("dy", ".35em")
+            .style("text-anchor", midAngle > Math.PI || midAngle < 0 ? "end" : "start")
+            // .text(activities.find(obj => obj[id] === this.names[i]))
+            // .text(result)
+            .text(this.names[i])
+            .attr("class", "pie-text")
+            .attr("id",  findEntryByName(this.names[i]).id+"_pie_text")
+            .style("font-family", "sans-serif")
+            .style("font-size", "10px")
+            .style("fill", "black");
 
         cumulativeDegrees += degree;
     });
-
-    // After collecting all texts, apply the force layout
-    this.applyForceLayout(texts);
 }
+
+//   drawNames() {
+//     let cumulativeDegrees = 0;
+//     const texts = []; // Array to store text element data for force simulation
+
+//     this.degrees.forEach((degree, i) => {
+//         const midAngle = this.degreesToRadians(cumulativeDegrees + degree / 4);//-Math.PI/8;
+//         const labelRadius = this.referenceRadius*1.1; // Adjusted for potential force simulation movement
+//         const x = labelRadius * Math.cos(midAngle - Math.PI / 2);
+//         const y = labelRadius * Math.sin(midAngle - Math.PI / 2);
+    
+
+
+//         let result = activities_dict[this.names[i]];
+
+//         const textData = {
+//             x: x,
+//             y: y,
+//             name: this.names[i],
+//             id: findEntryByName(this.names[i]).id + "_pie_text"
+//         };
+//         texts.push(textData);
+
+//         cumulativeDegrees += degree;
+//     });
+
+//     // After collecting all texts, apply the force layout
+//     this.applyForceLayout(texts);
+// }
+
 applyForceLayout(textData) {
   // let repulsion = this.repulsion_force;
   const center = { x: 0, y: 0 }; // Adjust if your center is different
@@ -274,37 +331,7 @@ applyForceLayout(textData) {
 //   }
 // }
 
-//   drawNames() {
-//     let cumulativeDegrees = 0;
-//     this.degrees.forEach((degree, i) => {
-//         const midAngle = this.degreesToRadians(cumulativeDegrees + degree / 2);
-//         const labelRadius = this.referenceRadius + 10; // Offset for labels outside the arcs
-//         const x = labelRadius * Math.cos(midAngle - Math.PI / 2);
-//         const y = labelRadius * Math.sin(midAngle - Math.PI / 2);
 
-// // console.log(activities[this.names[i]]);
-
-// // let result = findElementByKey(activities, 'id', this.names[i]);
-// let result=activities_dict[this.names[i]];
-// console.log(result);
-
-//         this.svg.append("text")
-//             .attr("x", x)
-//             .attr("y", y)
-//             .attr("dy", ".35em")
-//             .style("text-anchor", midAngle > Math.PI || midAngle < 0 ? "end" : "start")
-//             // .text(activities.find(obj => obj[id] === this.names[i]))
-//             // .text(result)
-//             .text(this.names[i])
-//             .attr("class", "pie-text")
-//             .attr("id",  findEntryByName(this.names[i]).id+"_pie_text")
-//             .style("font-family", "sans-serif")
-//             .style("font-size", "10px")
-//             .style("fill", "black");
-
-//         cumulativeDegrees += degree;
-//     });
-// }
 
 updateValuesAndRedraw(newValues) {
   console.log("old values", this.values);
