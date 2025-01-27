@@ -216,6 +216,10 @@ svg
 
 d3.selectAll(".activity_circle")
   .on("mouseover", function (event, d) {
+
+    console.log("yo wtf",this);
+
+
     if (isClicked) {console.log("clicked no mouseout");return;} // If clicked, disable mouseout behavior
 
     clean_activities_paths(); //targets activity paths only (optional)
@@ -223,12 +227,10 @@ d3.selectAll(".activity_circle")
     // sets innerhtml for headers and text on the right
     set_html_text(d,'activity');
 
-    // show lists of ACTIVITIES in bottom left
-    //activity_bullets(d);
+    //despite what the name says, this draws the links between actvities and experiences lol
+        //animates activity-experience paths
+   experience_bullets(d);
 
-    // show lists of EXPERIENCES in bottom left
-    //animates activity-experience paths
-   //experience_bullets(d);
 
   })
   .on("mouseout", function (event, d) {

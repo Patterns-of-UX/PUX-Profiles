@@ -906,146 +906,148 @@ function show_tooltip(d, pointer=false){
     
 // Function to check and respond to changes in isClicked
 function checkIsClicked() {
-  if (isClicked) {
-    startPulsing(rect.node()); // Start pulsing if isClicked is true
-    d3.select("#lock_toggle").text("UNLOCK")
+    if (isClicked) {
+      startPulsing(rect.node()); // Start pulsing if isClicked is true
+      d3.select("#lock_toggle").text("UNLOCK")
 
-  } else {
-    stopPulsing(rect.node());  // Stop pulsing and reset if isClicked is false
-    d3.select("#lock_toggle").text("LOCK")
+    } else {
+      stopPulsing(rect.node());  // Stop pulsing and reset if isClicked is false
+      d3.select("#lock_toggle").text("LOCK")
 
-  }
+    }
 }
 
 function startPulsing(element) {
-  pulse(element, "orange", "white");
+    pulse(element, "orange", "white");
 }
 
 function stopPulsing(element) {
-  d3.select(element).interrupt(); // Stops ongoing transitions
-  d3.select(element)
-    .attr("fill", "lightgray")
-    .attr("stroke-width", 1);
+    d3.select(element).interrupt(); // Stops ongoing transitions
+    d3.select(element)
+      .attr("fill", "lightgray")
+      .attr("stroke-width", 1);
 
-    d3.select("#lock_toggle").text("LOCK");
+      d3.select("#lock_toggle").text("LOCK");
 
 }
 
 function pulse(element, color1, color2) {
-  d3.select(element)
-  .attr("stroke",color1)
-    .transition()
-    .duration(1500)
-    .attr("fill", color1)
-    .transition()
-    .duration(1500)
-    .attr("fill", color2)
-    .on("end", function() {
-      if (isClicked) pulse(element, color1, color2); // Continue pulsing if isClicked is true
-    });
+    d3.select(element)
+    .attr("stroke",color1)
+      .transition()
+      .duration(1500)
+      .attr("fill", color1)
+      .transition()
+      .duration(1500)
+      .attr("fill", color2)
+      .on("end", function() {
+        if (isClicked) pulse(element, color1, color2); // Continue pulsing if isClicked is true
+      });
 }
 
 function drawCircleOnNewSVG(cx, cy, r, strokeColor, identifier) {
 
-  let clear_offset=50;
-  // Create new SVG if it doesn't exist
-  let newSVG = d3.select("#new-svg-container svg");
-  if (newSVG.empty()) {
-    newSVG = d3.select("#new-svg-container").append("svg")
-      .attr("width", 800) // Set appropriate width
-      .attr("height", 60); // Set appropriate height
+      let clear_offset=50;
+      // Create new SVG if it doesn't exist
+      let newSVG = d3.select("#new-svg-container svg");
+      if (newSVG.empty()) {
+        newSVG = d3.select("#new-svg-container").append("svg")
+          .attr("width", 800) // Set appropriate width
+          .attr("height", 60); // Set appropriate height
 
-       // Draw text under the circle
-  newSVG.append("text")
-  .attr("x", -5)
-  .attr("y", 10+clear_offset) // Position the text below the circle
-  .attr("text-anchor", "middle") // Center the text under the circle
-  .text("History")
-  .style("font-size", "14px") // Adjust font size as needed
-  .style("fill", "black")
-  .attr("transform", "rotate(-90, 15, 10)"); // Rotate 90 degrees around (15, 10)
-
-
-  // Draw the rectangle
- rect = newSVG.append("rect")
-.attr("x", 4)
-.attr("y", 12) // Adjust y-coordinate as needed
-.attr("width", 45)   // width of the rectangle
-.attr("height", 40)  // height of the rectangle
-.attr("stroke", "orange")
-.attr("fill", "lightgray"); // fill color of the rectangle
-
-checkIsClicked();
+          // Draw text under the circle
+      newSVG.append("text")
+      .attr("x", -5)
+      .attr("y", 10+clear_offset) // Position the text below the circle
+      .attr("text-anchor", "middle") // Center the text under the circle
+      .text("History")
+      .style("font-size", "14px") // Adjust font size as needed
+      .style("fill", "black")
+      .attr("transform", "rotate(-90, 15, 10)"); // Rotate 90 degrees around (15, 10)
 
 
+        // Draw the rectangle
+      rect = newSVG.append("rect")
+      .attr("x", 4)
+      .attr("y", 12) // Adjust y-coordinate as needed
+      .attr("width", 45)   // width of the rectangle
+      .attr("height", 40)  // height of the rectangle
+      .attr("stroke", "orange")
+      .attr("fill", "lightgray"); // fill color of the rectangle
 
-// Add hover (mouseover) and mouseout event listeners
-rect.on("mouseover", function() {
-d3.select(this)
-  .attr("stroke-width", 3) // Increase stroke width
-  .attr("stroke", "red") // Increase stroke width
-  .attr("fill", "orange");  // Change fill color on hover
-})
-.on("mouseout", function() {
-d3.select(this)
-  .attr("stroke-width", 1) // Reset stroke width
-  .attr("fill", "lightgray"); // Reset fill color
+      checkIsClicked();
+
+
+
+      // Add hover (mouseover) and mouseout event listeners
+      rect.on("mouseover", function() {
+        d3.select(this)
+          .attr("stroke-width", 3) // Increase stroke width
+          .attr("stroke", "red") // Increase stroke width
+          .attr("fill", "orange");  // Change fill color on hover
+
+
+      })
+      .on("mouseout", function() {
+      d3.select(this)
+        .attr("stroke-width", 1) // Reset stroke width
+        .attr("fill", "lightgray"); // Reset fill color
+      });
+
+      // Add click event listener
+      rect.on("click", function() {
+      // location.reload(); // Reloads the current page
+      checkIsClicked();
+
+      //experiences
+      clear_bullets();
+
+      clear_html_text();
+
+      // clean_experience_paths();  //targets experience paths and circles
+      fade_experience_paths(2000)
+      // clean_activities_paths(); //targets activity paths only (optional)
+      fade_activities_paths(2000);
+
+      d3.selectAll(".experience_circle").each(function(d, i) {
+          // 'this' refers to the current DOM element
+          // 'd' is the bound data, 'i' is the index
+          icon_dezoom(d);
+      });
+
+      d3.select("#tooltip").remove();
+
+      //remove vertical text over circles
+      d3.selectAll(".experience_names").remove();
+
+      //activities
+      // clean_activities_paths(); //targets activity paths only (optional)
+      fade_activities_paths(2000);
+
+      clear_html_text();
+      clear_bullets();
+
+      //remove vertical text over circles
+      d3.selectAll(".experience_names").remove();
+
+      isClicked=false;
+      d3.select("#lock_toggle").text("UNLOCK")
+      checkIsClicked();
+
 });
 
-// Add click event listener
-rect.on("click", function() {
-// location.reload(); // Reloads the current page
-checkIsClicked();
 
-//experiences
-clear_bullets();
-
-clear_html_text();
-
-// clean_experience_paths();  //targets experience paths and circles
-fade_experience_paths(2000)
-// clean_activities_paths(); //targets activity paths only (optional)
-fade_activities_paths(2000);
-
-d3.selectAll(".experience_circle").each(function(d, i) {
-  // 'this' refers to the current DOM element
-  // 'd' is the bound data, 'i' is the index
-  icon_dezoom(d);
-});
-
-d3.select("#tooltip").remove();
-
-//remove vertical text over circles
-d3.selectAll(".experience_names").remove();
-
-//activities
-// clean_activities_paths(); //targets activity paths only (optional)
-fade_activities_paths(2000);
-
-clear_html_text();
-clear_bullets();
-
- //remove vertical text over circles
- d3.selectAll(".experience_names").remove();
-
- isClicked=false;
- d3.select("#lock_toggle").text("UNLOCK")
- checkIsClicked();
-
-});
-
-
- // Draw text under the circle
- newSVG.append("text")
- .style("pointer-events", "none")
- .attr("id", "lock_toggle")
- .attr("x", 26)
- .attr("y", 36) 
- .attr("text-anchor", "middle") // Center the text under the circle
- .text("UNLOCK")
- .style("font-size", "10.5px") // Adjust font size as needed
- .style("fill", "black");
-//  .attr("transform", "rotate(-90, 15, 10)"); // Rotate 90 degrees around (15, 10)
+    // Draw text under the circle
+    newSVG.append("text")
+    .style("pointer-events", "none")
+    .attr("id", "lock_toggle")
+    .attr("x", 26)
+    .attr("y", 36) 
+    .attr("text-anchor", "middle") // Center the text under the circle
+    .text("UNLOCK")
+    .style("font-size", "10.5px") // Adjust font size as needed
+    .style("fill", "black");
+    //  .attr("transform", "rotate(-90, 15, 10)"); // Rotate 90 degrees around (15, 10)
   }
 
   // Calculate new circle position
